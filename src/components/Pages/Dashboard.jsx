@@ -1,17 +1,36 @@
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { AuthContext } from '../Providers/AuthProvider';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingUi from '../Ui/LoadingUi';
 import { LuPlus } from 'react-icons/lu';
 import TaskModalForm from '../Ui/TaskModalForm';
+import useAxiosPublic from '../../customHooks/useAxiosPublic';
+import { useQuery } from '@tanstack/react-query';
 
 const Dashboard = () => {
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
   const { user, loading } = useContext(AuthContext);
 
+  const axiosPublic = useAxiosPublic();
+
+  const getData = useCallback(async (email) => {
+    try {
+        const response = await axiosPublic.get(`/api/tasks?email=${email}`);
+        return response?.data;
+    } catch (error) {
+        console.log(error);
+    }
+  }, [axiosPublic]);
+
+  const { isLoading, error, data } = useQuery({
+    queryKey: ['tasksData', user?.email],
+    queryFn: () => getData(user?.email)
+  });
+
+  console.log(isLoading, error, data);
+
   const handleClick = () => {
-    console.log('modal button new');
     setVisible(true);
   };
 
