@@ -24,7 +24,7 @@ const TaskModalForm = ({ visible, setVisible }) => {
   } = useForm();
 
   const onsubmit = async (data) => {
-    const task = {email : user?.email, ...data};
+    const task = {email : user?.email, status: 'todo', ...data};
     axiosPublic
       .post('/api/tasks', task)
       .then((response) => {
